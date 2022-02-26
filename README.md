@@ -4,6 +4,7 @@ Attention: Number of columns must be 14.
 
 ### Step
 
+- `pip install solve-logic Pillow numpy`
 - open https://www.wowgame.jp/game_html/10986.html
 - Zoom to 133%.
 - Capture the image(*.jpg) to Desktop.
