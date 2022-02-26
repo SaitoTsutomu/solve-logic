@@ -1,0 +1,22 @@
+[tool.poetry]
+authors = ["Saito Tsutomu <tsutomu7@hotmail.co.jp>"]
+description = "Solve logic puzzle game."
+name = "solve-logic"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^4.0.1"
+black = "^22.1.0"
+isort = "^5.10.1"
+mypy = "^0.931"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool.poetry.scripts]
+solve-logic = "solve_logic:main"
