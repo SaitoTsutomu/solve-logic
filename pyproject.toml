@@ -1,8 +1,18 @@
 [tool.poetry]
 authors = ["Saito Tsutomu <tsutomu7@hotmail.co.jp>"]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Topic :: Software Development",
+  "Topic :: Scientific/Engineering",
+]
 description = "Solve a logic puzzle game."
+homepage = "https://github.com/SaitoTsutomu/solve-logic"
+license = "MIT"
 name = "solve-logic"
-version = "0.1.1"
+readme = "README.md"
+version = "0.1.2"
 
 [tool.poetry.dependencies]
 python = "^3.10"
