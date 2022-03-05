@@ -4,6 +4,7 @@ from collections import Counter
 from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
+from time import sleep
 
 
 @dataclass
@@ -168,7 +169,19 @@ def show_move(fnam):
     os.remove(fnam)
 
 
-def main(dir=None):
+def main(wait=0, dir=None):
     pth = Path(dir or f"{os.environ['HOME']}/Desktop/")
-    fnam = max((f.stat().st_mtime, f) for f in pth.glob("*.jpg"))[1]
-    show_move(fnam)
+    while True:
+        lst = [(f.stat().st_mtime, f) for f in pth.glob("*.jpg")]
+        if lst:
+            show_move(max(lst)[1])
+        if not wait:
+            break
+        sleep(wait)
+        print()
+
+
+def run():
+    from fire import Fire
+
+    Fire(main)

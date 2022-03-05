@@ -12,9 +12,10 @@ homepage = "https://github.com/SaitoTsutomu/solve-logic"
 license = "MIT"
 name = "solve-logic"
 readme = "README.md"
-version = "0.1.5"
+version = "0.1.6"
 
 [tool.poetry.dependencies]
+fire = "^0.4.0"
 python = "^3.9"
 
 [tool.poetry.dev-dependencies]
@@ -31,4 +32,4 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=1.0.0"]
 
 [tool.poetry.scripts]
-solve-logic = "solve_logic:main"
+solve-logic = "solve_logic:run"
