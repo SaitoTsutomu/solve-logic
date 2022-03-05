@@ -1,8 +1,9 @@
 import os
+import re
 from collections import Counter
 from copy import copy
 from dataclasses import dataclass
-from glob import glob
+from pathlib import Path
 
 
 @dataclass
@@ -38,7 +39,7 @@ class Column:
 
     def __init__(self, index: int, s: str):
         self.index = index
-        self.groups = list(to_groups(s))
+        self.groups = list(to_groups(s.strip("-")))
         self.space = 4 - sum(g.n for g in self.groups)
 
     def __str__(self):
@@ -81,9 +82,9 @@ def show(columns):
 class Table:
     columns: list[Column]
 
-    def __init__(self, info: str, nspace=2):
-        self.columns = [Column(i, s) for i, s in enumerate(info.split() + [""] * nspace)]
-        c = Counter(info.replace(" ", "")).most_common()
+    def __init__(self, info: str):
+        self.columns = [Column(i, s) for i, s in enumerate(info.split())]
+        c = Counter(re.sub("[ -]+", "", info)).most_common()
         if not all(n == 4 for _, n in c):
             print(c)
             show(self.columns)
@@ -116,8 +117,10 @@ def get_game_str(fnam):
     import numpy as np
     from PIL import Image
 
-    bst = "bcehiknrstuy"
+    bst = " -bcehiknrstuy"
     bas = [
+        [247, 231, 194],
+        [215, 192, 149],
         [79, 152, 70],
         [240, 192, 85],
         [222, 142, 93],
@@ -134,26 +137,38 @@ def get_game_str(fnam):
     with Image.open(fnam) as im:
         ar = np.array(im)
 
-    dy = np.argmax(ar.mean(2).std(1) > 7) + 65
-    dx = np.argmax(ar.mean(2)[dy - 65] < 200) + 2
-    rs = []
-    for i in range(12):
-        rrs = []
-        x = 1000 * (i % 7) // 6 + dx - 20
-        for j in range(4):
-            y = 90 * j + dy - 20 + (i >= 7) * 599
+    ar = ar[:, (ar.mean(2).mean(0) > 235).argmin() :]
+    dy = np.argmax(ar.mean(2).std(1) > 9)
+    dx = np.argmax(ar.mean(2)[dy] < 200)
+    ar = ar[dy + 45 :, dx - 18 :]
+    ncols = [0, 0]
+    for h in range(2):
+        y = 330 + h * 599
+        for i in range(13):
+            x = 1000 * i // 12
             v = ar[y : y + 40, x : x + 40].reshape(-1, 3).mean(0)
-            rrs.append(bst[np.linalg.norm(v - bas, axis=1).argmin()])
-        rs.append("".join(rrs))
+            ncols[h] += np.linalg.norm(v - bas, axis=1).argmin() == 1
+    hd = ncols[1] - ncols[0]
+    rs = []
+    for h, ncol in enumerate(ncols):
+        for i in range(ncol):
+            rrs = []
+            x = 500 * (2 * i - h * hd) // 6
+            for j in range(4):
+                y = 90 * j + h * 599
+                v = ar[y : y + 40, x : x + 40].reshape(-1, 3).mean(0)
+                rrs.append(bst[np.linalg.norm(v - bas, axis=1).argmin()])
+            rs.append("".join(rrs))
     return " ".join(rs)
 
 
 def show_move(fnam):
-    s = get_game_str(fnam)
-    table = Table(s, 14 - len(s.split()))
+    table = Table(get_game_str(fnam))
     print("\n".join(solve_logic(table, set(), []) or []))
+    os.remove(fnam)
 
 
 def main(dir=None):
-    dir = dir or f"{os.environ['HOME']}/Desktop/"
-    show_move(glob(f"{dir}/*.jpg")[0])
+    pth = Path(dir or f"{os.environ['HOME']}/Desktop/")
+    fnam = max((f.stat().st_mtime, f) for f in pth.glob("*.jpg"))[1]
+    show_move(fnam)
